@@ -15,10 +15,9 @@ int total_iterations = 1000;
 int interval = total_iterations/10;
 
 int main() {
-    // 1. Setup Raylib
-    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT);
-    InitWindow(1280, 720, "Differentiable Physics Training");
-    SetTargetFPS(500); // Set high so training isn't too slow, or use 60 for smooth viewing
+    SetConfigFlags(FLAG_FULLSCREEN_MODE | FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT);
+    InitWindow(0, 0, "Differentiable Physics Engine - DiffX");
+    SetTargetFPS(1000);
 
     Camera3D camera = { 0 };
     camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
@@ -35,8 +34,8 @@ int main() {
     float last_e = -1;
     for (int iter = 0; iter <= total_iterations; ++iter) {
         if (WindowShouldClose()) break;
+        if (IsKeyPressed(KEY_F11)) ToggleFullscreen();
 
-        // Reset Simulation State for this Iteration
         DiffX::Dual<float> diss(dissipation_guess, 1.0f);
         DiffX::Vector3<DiffX::Dual<float>> pos(0.0f, start_h, 0.0f);
         DiffX::Vector3<DiffX::Dual<float>> vel(0.0f, 0.0f, 0.0f);
@@ -48,7 +47,6 @@ int main() {
         bool hit_ground = false;
         bool going_up = false;
         bool imp = (iter%interval==0) ? true : false;
-        // INNER LOOP: Single Physics Run (until peak is reached)
         while (hit_ground == false || going_up == true || pos.y.v < 0.5f) {
             if (WindowShouldClose()) break;
 
@@ -65,41 +63,56 @@ int main() {
             if (imp) {
                 BeginDrawing();
                     ClearBackground(BLACK);
+                    float uiScale = GetScreenWidth() / 1920.0f;
+                    if (uiScale < 0.7f) uiScale = 0.7f;
+
                     BeginMode3D(camera);
                         DrawGrid(10, 1.0f);
-                        // Map your Vector3 to Raylib Vector3
                         ::Vector3 rayPos = { pos.x.v, pos.y.v, pos.z.v };
                         DrawSphere(rayPos, 0.5f, GOLD);
                     EndMode3D();
 
-                    // --- UI OVERLAY: Status & Progress ---
-                    DrawRectangle(10, 10, 330, 240, Fade(BLACK, 0.8f)); // Semi-transparent background for readability
-                    DrawRectangleLines(10, 10, 330, 240, DARKGRAY);
+                    int panelWidth = 350 * uiScale;
+                    int panelHeight = 260 * uiScale;
+                    int padding = 15 * uiScale;
 
-                    DrawText(TextFormat("PHASE: %s", imp ? "VISUALIZING" : "CRUNCHING"), 20, 20, 20, imp ? GOLD : SKYBLUE);
-                    DrawText(TextFormat("Iteration: %d / %d", iter, total_iterations), 20, 45, 18, RAYWHITE);
+                    DrawRectangle(10, 10, panelWidth, panelHeight, Fade(BLACK, 0.8f));
+                    DrawRectangleLines(10, 10, panelWidth, panelHeight, DARKGRAY);
 
-                    DrawLine(20, 75, 320, 75, DARKGRAY); // Divider
-                    DrawText("TARGETS:", 20, 85, 15, GRAY);
-                    DrawText(TextFormat("Target Height: %.4f m", target_bounce_h), 20, 105, 20, LIME);
-                    DrawText(TextFormat("Target e:      %.4f", target_e), 20, 130, 20, GREEN);
+                    DrawText(TextFormat("PHASE: %s", imp ? "VISUALIZING" : "CRUNCHING"), 10 + padding, 20, 22 * uiScale, imp ? GOLD : SKYBLUE);
+                    DrawText(TextFormat("Iteration: %d / %d", iter, total_iterations), 10 + padding, 50 * uiScale, 18 * uiScale, RAYWHITE);
 
-                    DrawLine(20, 160, 320, 160, DARKGRAY); // Divider
-                    DrawText("LIVE PERFORMANCE:", 20, 170, 15, GRAY);
-                    DrawText(TextFormat("Current Peak:  %.4f m", max_height.v), 20, 190, 20, GOLD);
-                    DrawText((last_e==-1) ? "Previous e: NA" : TextFormat("Previous e:     %.4f", last_e), 20, 215, 20, ORANGE);
+                    DrawLine(10 + padding, 80 * uiScale, 10 + panelWidth - padding, 80 * uiScale, DARKGRAY);
+                    DrawText("TARGETS:", 10 + padding, 90 * uiScale, 15 * uiScale, GRAY);
+                    DrawText(TextFormat("Target Height: %.4f m", target_bounce_h), 10 + padding, 110 * uiScale, 20 * uiScale, LIME);
+                    DrawText(TextFormat("Target e:      %.4f", target_e), 10 + padding, 135 * uiScale, 20 * uiScale, GREEN);
 
-                    int rightX = GetScreenWidth() - 350;
-                    DrawRectangle(rightX, 10, 340, 110, Fade(BLACK, 0.8f));
-                    DrawText("OPTIMIZER STATE:", rightX + 10, 20, 15, GRAY);
-                    DrawText(TextFormat("Dissipation (Guess): %.4f", dissipation_guess), rightX + 10, 40, 20, SKYBLUE);
-                    DrawText(TextFormat("Learning Rate:       %g", learning_rate), rightX + 10, 65, 20, YELLOW);
-                    DrawText((last_loss==-1) ? "Previous Loss: NA" : TextFormat("Previous Loss:        %.6f", last_loss), rightX + 10, 90, 20, RED);
+                    DrawLine(10 + padding, 165 * uiScale, 10 + panelWidth - padding, 165 * uiScale, DARKGRAY);
+                    DrawText("LIVE PERFORMANCE:", 10 + padding, 175 * uiScale, 15 * uiScale, GRAY);
+                    DrawText(TextFormat("Current Peak:  %.4f m", max_height.v), 10 + padding, 195 * uiScale, 20 * uiScale, GOLD);
+                    DrawText((last_e == -1) ? "Previous e: NA" : TextFormat("Previous e:     %.4f", last_e), 10 + padding, 225 * uiScale, 20 * uiScale, ORANGE);
+
+                    int optWidth = 360 * uiScale;
+                    int optHeight = 120 * uiScale;
+                    int rightX = GetScreenWidth() - optWidth - 10;
+
+                    DrawRectangle(rightX, 10, optWidth, optHeight, Fade(BLACK, 0.8f));
+                    DrawRectangleLines(rightX, 10, optWidth, optHeight, DARKGRAY);
+                    
+                    DrawText("OPTIMIZER STATE:", rightX + padding, 20, 15 * uiScale, GRAY);
+                    DrawText(TextFormat("Dissipation: %.4f", dissipation_guess), rightX + padding, 45 * uiScale, 20 * uiScale, SKYBLUE);
+                    DrawText(TextFormat("Learn Rate:  %g", learning_rate), rightX + padding, 70 * uiScale, 20 * uiScale, YELLOW);
+                    DrawText((last_loss == -1) ? "Prev Loss: NA" : TextFormat("Prev Loss:   %.6f", last_loss), rightX + padding, 95 * uiScale, 20 * uiScale, RED);
+
+                    const char* hint = "Click F11 to Toggle Fullscreen";
+                    int fontSize = 20 * uiScale;
+                    int textWidth = MeasureText(hint, fontSize);
+                    DrawText(hint, GetScreenWidth()/2 - textWidth/2, GetScreenHeight() - 40 * uiScale, fontSize, Fade(GRAY, 0.6f));
+
                 EndDrawing();
             }
         }
 
-        // CALCULATION: Update based on the peak reached in the while loop
         DiffX::Dual<float> loss = (max_height - target_bounce_h) * (max_height - target_bounce_h);
         last_loss = loss.v;
         last_e = sqrt(max_height.v/start_h);
