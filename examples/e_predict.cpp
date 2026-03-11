@@ -17,17 +17,17 @@ int main() {
 
     std::cout << "Initial Height: " << start_h << "m" << std::endl << "Target Height: " << target_bounce_h << std::endl << "e: " << target_e << std::endl;
 
-    Dual<float> k(5000.0f, 0.0f);
-    Vector3<Dual<float>> g(0.0f, -9.81f, 0.0f);
+    DiffX::Dual<float> k(5000.0f, 0.0f);
+    DiffX::Vector3<DiffX::Dual<float>> g(0.0f, -9.81f, 0.0f);
 
     for (int iter = 0; iter < 1000; ++iter) {
-        Dual<float> diss(dissipation_guess, 1.0f);
+        DiffX::Dual<float> diss(dissipation_guess, 1.0f);
 
-        Vector3<Dual<float>> pos(0.0f, start_h, 0.0f);
-        Vector3<Dual<float>> vel(0.0f, 0.0f, 0.0f);
-        Dual<float> max_height(0.0f, 0.0f);
+        DiffX::Vector3<DiffX::Dual<float>> pos(0.0f, start_h, 0.0f);
+        DiffX::Vector3<DiffX::Dual<float>> vel(0.0f, 0.0f, 0.0f);
+        DiffX::Dual<float> max_height(0.0f, 0.0f);
         
-        Solver<Dual<float>> engine;
+        DiffX::Solver<DiffX::Dual<float>> engine;
         float dt = 0.001f;
 
         bool hit_ground = false;
@@ -43,7 +43,7 @@ int main() {
             }
         }
 
-        Dual<float> loss = (max_height - target_bounce_h) * (max_height - target_bounce_h);
+        DiffX::Dual<float> loss = (max_height - target_bounce_h) * (max_height - target_bounce_h);
 
         dissipation_guess -= loss.d * learning_rate;
 

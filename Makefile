@@ -1,8 +1,7 @@
 # --- Compiler & Flags ---
 CXX      := g++
-CXXFLAGS := -std=c++17 -O3 -march=native -ffast-math -Iinclude
-# LDFLAGS can be used for linking libraries like CUDA or OpenMP later
-LDFLAGS  := 
+CXXFLAGS := -std=c++17 -O3 -Iinclude 
+LDFLAGS  := -L. -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 # --- Directories ---
 SRC_DIR   := src
