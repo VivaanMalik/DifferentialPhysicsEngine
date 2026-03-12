@@ -113,7 +113,7 @@ int main() {
             }
         }
 
-        DiffX::Dual<float> loss = (max_height - target_bounce_h) * (max_height - target_bounce_h);
+        DiffX::Dual<float> loss = (max_height.v - target_bounce_h) * (max_height.v - target_bounce_h);
         last_loss = loss.v;
         last_e = sqrt(max_height.v/start_h);
         dissipation_guess -= loss.d * learning_rate;

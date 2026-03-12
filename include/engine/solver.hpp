@@ -1,6 +1,8 @@
 #pragma once
-#include "core/vector3.hpp"
 #include <cmath>
+#include "core/vector3.hpp"
+#include "body_definition.hpp"
+#include "rigidbody.hpp"
 
 namespace DiffX {
     template <typename T>
@@ -19,5 +21,8 @@ namespace DiffX {
                 vel = vel + total_f * T(dt);
                 pos = pos + vel * T(dt);
             }
+        
+            private:
+                Vector3<Dual> aggregate_forces(const RigidBodyState& s, const BodyDefinition& d);
     };
 }
