@@ -8,12 +8,12 @@ namespace DiffX {
         public:
             double learning_rate = 0.01;
 
-            // The core loop
-            void optimize_step(Simulation& sim, Vector3<double> target_pos) {
-                // sim.run_forward(...);
-                // Dual loss = calculate_loss(sim.tape.back(), target_pos);
-                // double grad = loss.der;
-                // sim.params[0].mass.val -= learning_rate * grad;
-            }
+            // // The core loop
+            // void optimize_step(Simulation& sim, Vector3<double> target_pos) {
+            //     // sim.run_forward(...);
+            //     // Dual loss = calculate_loss(sim.tape.back(), target_pos);
+            //     // double grad = loss.der;
+            //     // sim.params[0].mass.val -= learning_rate * grad;
+            // }
     };
 }

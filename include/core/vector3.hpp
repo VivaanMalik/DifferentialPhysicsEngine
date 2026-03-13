@@ -14,4 +14,10 @@ namespace DiffX {
         inline T dot(const Vector3& v) const { return x * v.x + y * v.y + z * v.z; }
         inline Vector3 cross(const Vector3& v) const { return Vector3(y*v.z - v.y*z, z*v.x - v.z*x, x*v.y - v.x*y); }
     };
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, const Vector3<T>& v) {
+        os << "[  " << v.x << "   " << v.y << "   " << v.z << "  ]";
+        return os;
+    }
 }

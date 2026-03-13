@@ -1,28 +1,26 @@
 #pragma once
 #include <cmath>
+#include <vector>
 #include "core/vector3.hpp"
 #include "body_definition.hpp"
+#include "system_state.hpp"
 #include "rigidbody.hpp"
 
 namespace DiffX {
     template <typename T>
     class Solver {
         public:
-            float eps = 0.1f;
-
             // simulating springy
-            void step(Vector3<T>& pos, Vector3<T>& vel, float dt, Vector3<T> gravity, T k, T dissipation) {        
-                T activation = exp(-pos.y / T(eps)); 
-                T spring_f = activation * k;
-                T damping_f = -vel.y * activation * dissipation;
+            SystemState<T> step(SystemState<T> systemState, float dt) { 
+                SystemState<T> newState = systemState;
+                for (int b = 0; b < systemState.bodies.size(); b++) {    
 
-                Vector3<T> total_f = gravity + Vector3<T>(0.0f, spring_f + damping_f, 0.0f);
+                    newState.bodies[b].linear_velocity = systemState.bodies[b].linear_velocity + systemState.bodies[b].force*systemState.bodies[b].body.invMass * T(dt);
+                    newState.bodies[b].position = systemState.bodies[b].position + systemState.bodies[b].linear_velocity * T(dt);
 
-                vel = vel + total_f * T(dt);
-                pos = pos + vel * T(dt);
+                    newState.bodies[b].force = {0, 0, 0};
+                }
+                return newState;
             }
-        
-            private:
-                Vector3<Dual> aggregate_forces(const RigidBodyState& s, const BodyDefinition& d);
     };
 }

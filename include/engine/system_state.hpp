@@ -11,10 +11,29 @@ namespace DiffX {
         */
 
         public:
-            double timestep;
-            std::vector<Rigidbody> bodies;
+            std::vector<Rigidbody<T>> bodies;
 
-            // helper
-            Dual calculate_distance_to(int body_idx, Vector3<double> target);
+            void add_body(Rigidbody<T> b) {
+                b.ID = bodies.size();
+                bodies.push_back(b);
+            }
+
+            SystemState<T>& operator=(const SystemState<T>& other) {
+                if (this != &other) {
+                    this->timestep = other.timestep;
+                    this->bodies = other.bodies;
+                }
+                return *this;
+            }
     };
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, const SystemState<T>& ss) {
+        os << "System State\n";
+        for (int i = 0; i < ss.bodies.size(); i++) {
+            os << ss.bodies[i];
+        }
+        os << "\n";
+        return os;
+    }  
 }

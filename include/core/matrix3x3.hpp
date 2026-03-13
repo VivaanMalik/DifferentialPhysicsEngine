@@ -1,10 +1,14 @@
 #pragma once
 #include <cmath>
+#include <initializer_list>
+#include "vector3.hpp"
 
 namespace DiffX {
     template <typename T>
     struct Matrix3x3 {
         T data[3][3];
+
+        Matrix3x3() : data{{T(1.0f), T(0.0f), T(0.0f)}, {T(0.0f), T(1.0f), T(0.0f)}, {T(0.0f), T(0.0f), T(1.0f)}} {}
 
         Matrix3x3(std::initializer_list<std::initializer_list<T>> list) {
             int row = 0;
@@ -22,7 +26,7 @@ namespace DiffX {
             return Vector3<T>(
                 data[0][0]*v.x+data[0][1]*v.y+data[0][2]*v.z,
                 data[1][0]*v.x+data[1][1]*v.y+data[1][2]*v.z,
-                data[2][0]*v.x+data[2][1]*v.y+data[2][2]*v.z,
+                data[2][0]*v.x+data[2][1]*v.y+data[2][2]*v.z
             );
         }
 
@@ -58,4 +62,12 @@ namespace DiffX {
             };
         }
     };
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, const Matrix3x3<T>& m) {
+        os << "⎡  " << m.data[0][0] << " " << m.data[0][1] << " " << m.data[0][2] << "  ⎤\n"
+           << "⎢  " << m.data[0][0] << " " << m.data[0][1] << " " << m.data[0][2] << "  ⎥\n"
+           << "⎣  " << m.data[0][0] << " " << m.data[0][1] << " " << m.data[0][2] << "  ⎦";
+        return os;
+    }
 }

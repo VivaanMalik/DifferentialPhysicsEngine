@@ -9,12 +9,12 @@ namespace DiffX {
         Quaternion() : x(0), y(0), z(0), w(0) {}
         Quaternion(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) {}
 
-        Quaternion operator *(Quaternion a, Quaternion b) {
+        Quaternion operator *(Quaternion b) {
             return Quaternion(
-                a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-                a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
-                a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
-                a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+                w * b.x + x * b.w + y * b.z - z * b.y,
+                w * b.y + y * b.w + z * b.x - x * b.z,
+                w * b.z + z * b.w + x * b.y - y * b.x,
+                w * b.w - x * b.x - y * b.y - z * b.z
             );
         }
 
@@ -26,4 +26,10 @@ namespace DiffX {
             return x * x + y * y + z * z + w * w;
         }
     };
+
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q) {
+        os << "Q: " << q.w << " | [  " << q.x << ", " << q.y << ", " << q.z << "  ]";
+        return os;
+    }
 }

@@ -1,6 +1,9 @@
 #pragma once
 #include "system_state.hpp"
 #include "body_definition.hpp"
+#include "system_state.hpp"
+#include "solver.hpp"
+#include "core/dual.hpp"
 
 namespace DiffX {
     template <typename T>
@@ -10,11 +13,25 @@ namespace DiffX {
         Mathematical Responsibility: Orchestrating the Forward Pass. It seeds the initial "Dual" weights. For example, if you want to optimize "Initial Kick Force," you set kick_force.der = 1.0 before calling run()
         */
 
-        std::vector<SystemState> tape; // The history for BPTT
-        std::vector<BodyDefinition> params;
+       DiffX::Solver<T> solver;
+       
+       public:
+       std::vector<SystemState<T>> tape;
+       std::vector<BodyDefinition<T>> params;
+       
+        void run_forward(int num_steps, float dt) {
+            for (int i = 0; i < num_steps; i++) {
+                SystemState<T> state = solver.step(tape.back(), dt);
+                tape.push_back(state);
+            }
+        }
 
-        void run_forward(int num_steps, double dt);
-        double get_final_gradient(int body_idx); 
-        void reset_to_state(const SystemState& start);
+        void clear() {
+            tape.clear();
+        }
+
+        Simulation<T>(const SystemState<T> initial) {
+            tape.push_back(initial);
+        }
     };
 }
