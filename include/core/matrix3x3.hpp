@@ -66,8 +66,8 @@ namespace DiffX {
     template <typename T>
     std::ostream& operator<<(std::ostream& os, const Matrix3x3<T>& m) {
         os << "⎡  " << m.data[0][0] << " " << m.data[0][1] << " " << m.data[0][2] << "  ⎤\n"
-           << "⎢  " << m.data[0][0] << " " << m.data[0][1] << " " << m.data[0][2] << "  ⎥\n"
-           << "⎣  " << m.data[0][0] << " " << m.data[0][1] << " " << m.data[0][2] << "  ⎦";
+           << "⎢  " << m.data[1][0] << " " << m.data[1][1] << " " << m.data[1][2] << "  ⎥\n"
+           << "⎣  " << m.data[2][0] << " " << m.data[2][1] << " " << m.data[2][2] << "  ⎦";
         return os;
     }
 }
